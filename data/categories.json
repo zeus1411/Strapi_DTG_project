@@ -1,0 +1,44 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "name": "Technology",
+      "slug": "technology",
+      "description": "All tech-related products and courses",
+      "icon": "💻",
+      "order": 1,
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "name": "Business",
+      "slug": "business",
+      "description": "Business and entrepreneurship",
+      "icon": "💼",
+      "order": 2,
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "name": "Design",
+      "slug": "design",
+      "description": "UI/UX and graphic design",
+      "icon": "🎨",
+      "order": 3,
+      "isActive": true
+    },
+    {
+      "id": 4,
+      "name": "Marketing",
+      "slug": "marketing",
+      "description": "Digital marketing and SEO",
+      "icon": "📢",
+      "order": 4,
+      "isActive": false
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2025-12-24"
+  }
+}
