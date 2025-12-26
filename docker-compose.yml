@@ -1,0 +1,66 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: strapi_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-strapi}
+      POSTGRES_USER: ${DATABASE_USERNAME:-strapi}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-strapi}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Note: SQL scripts in ./database folder require tables created by Strapi first
+      # Run them manually after Strapi has initialized the database
+    ports:
+      - "${DATABASE_PORT:-5432}:5432"
+    networks:
+      - strapi_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME:-strapi}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Strapi Backend
+  strapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: strapi_backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_NAME: ${DATABASE_NAME:-strapi}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:-strapi}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-strapi}
+      DATABASE_SSL: ${DATABASE_SSL:-false}
+      JWT_SECRET: ${JWT_SECRET:-your-jwt-secret-change-this}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:-your-admin-jwt-secret-change-this}
+      APP_KEYS: ${APP_KEYS:-your-app-keys-change-this}
+      API_TOKEN_SALT: ${API_TOKEN_SALT:-your-api-token-salt-change-this}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT:-your-transfer-token-salt-change-this}
+      HOST: ${HOST:-0.0.0.0}
+      PORT: ${PORT:-1337}
+    volumes:
+      - ./public/uploads:/app/public/uploads
+      # Mount data folder if needed
+      - ./data:/app/data
+    ports:
+      - "${PORT:-1337}:1337"
+    networks:
+      - strapi_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  strapi_network:
+    driver: bridge
