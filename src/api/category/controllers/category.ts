@@ -8,27 +8,37 @@ export default factories.createCoreController('api::category.category', ({ strap
       const user = ctx.state.user;
       strapi.log.info(`User accessing Category Report: ${user?.email || 'Public'}`);
 
-      const result = await strapi.db.connection.raw(
-        'SELECT get_category_report()'
+      // ✅ Query 1: Get report statistics (TABLE - 1 row)
+      const reportResult = await strapi.db.connection.raw(
+        'SELECT * FROM get_category_report()'
       );
 
-      // PostgreSQL trả về array, lấy row đầu tiên
-      const reportData = result.rows[0]?.get_category_report;
+      // ✅ Query 2: Get top categories (TABLE - nhiều rows)
+      const topCategoriesResult = await strapi.db.connection.raw(
+        'SELECT * FROM get_top_categories(?)',
+        [50] // Limit 50 categories
+      );
+
+      const reportData = reportResult.rows[0];
+      const topCategories = topCategoriesResult.rows;
 
       if (!reportData) {
         return ctx.notFound({
-          message: 'Procedure chưa được tạo hoặc không có data',
-          guide: 'Xem file: database/SETUP_PROCEDURES_GUIDE.sql để tạo procedure'
+          message: 'Function chưa được tạo hoặc không có data',
+          guide: 'Xem file: database/OPTIMIZED_PROCEDURES_TABLE_VERSION.sql'
         });
       }
 
       return ctx.send({
         success: true,
-        data: reportData,
+        data: {
+          ...reportData,  // ⭐ Spread stats: total_categories, active_categories, etc.
+          topCategories   // ⭐ Array of top categories
+        },
         meta: {
           generatedAt: new Date().toISOString(),
           user: user ? { email: user.email } : 'Public',
-          source: 'PostgreSQL Function: get_category_report()'
+          source: 'PostgreSQL Functions: get_category_report() + get_top_categories()'
         }
       });
 
@@ -38,13 +48,13 @@ export default factories.createCoreController('api::category.category', ({ strap
       // Friendly error message
       if (error.message.includes('does not exist')) {
         return ctx.badRequest({
-          message: 'Stored procedure chưa được tạo trong database',
-          solution: 'Làm theo hướng dẫn trong: database/SETUP_PROCEDURES_GUIDE.sql',
+          message: 'Stored function chưa được tạo trong database',
+          solution: 'Làm theo hướng dẫn trong: database/OPTIMIZED_PROCEDURES_TABLE_VERSION.sql',
           steps: [
             '1. Mở pgAdmin4',
             '2. Connect vào database: testing_strapi_2',
-            '3. Query Tool → Copy SQL từ file',
-            '4. Execute để tạo procedure',
+            '3. Query Tool → Copy SQL từ file OPTIMIZED_PROCEDURES_TABLE_VERSION.sql',
+            '4. Execute để tạo functions',
             '5. Thử lại API này'
           ]
         });
@@ -55,56 +65,49 @@ export default factories.createCoreController('api::category.category', ({ strap
   },
 
   /**
-   * CATEGORY REPORT PROC - gọi PROCEDURE
+   * CATEGORY REPORT PROC - gọi FUNCTION (TABLE version)
    */
   async getCategoryReportProc(ctx) {
     try {
       const user = ctx.state.user;
       strapi.log.info(`User accessing Category Report PROC: ${user?.email || 'Public'}`);
       
-      // Tạo temp table để lưu kết quả
-      await strapi.db.connection.raw(
-        'CREATE TEMP TABLE IF NOT EXISTS temp_report (data JSON)'
+      // ✅ Giờ là function, gọi đơn giản như get_category_report
+      const reportResult = await strapi.db.connection.raw(
+        'SELECT * FROM get_category_report_proc()'
       );
-      
-      // Xóa data cũ
-      await strapi.db.connection.raw('TRUNCATE temp_report');
-      
-      // Gọi PROCEDURE và lưu kết quả vào temp table
-      await strapi.db.connection.raw(`
-        DO $$
-        DECLARE report_data JSON;
-        BEGIN
-          CALL get_category_report_proc(report_data);
-          INSERT INTO temp_report VALUES (report_data);
-        END $$;
-      `);
-      
-      // Lấy kết quả từ temp table
-      const result = await strapi.db.connection.raw('SELECT data FROM temp_report');
-      const reportData = result.rows[0]?.data;
+
+      const topCategoriesResult = await strapi.db.connection.raw(
+        'SELECT * FROM get_top_categories(?)',
+        [50]
+      );
+
+      const reportData = reportResult.rows[0];
+      const topCategories = topCategoriesResult.rows;
 
       if (!reportData) {
         return ctx.notFound({
-          message: 'Procedure chưa được tạo hoặc không có data',
-          guide: 'Xem file: database/SETUP_PROCEDURES_GUIDE.sql'
+          message: 'Function chưa được tạo hoặc không có data',
+          guide: 'Xem file: database/OPTIMIZED_PROCEDURES_TABLE_VERSION.sql'
         });
       }
 
       return ctx.send({
         success: true,
-        data: reportData,
+        data: {
+          ...reportData,
+          topCategories
+        },
         meta: {
           generatedAt: new Date().toISOString(),
           user: user ? { email: user.email } : 'Public',
-          source: 'PostgreSQL PROCEDURE: get_category_report_proc()',
-          note: 'So sánh với /report endpoint (dùng FUNCTION) - PROCEDURE phức tạp hơn!'
+          source: 'PostgreSQL Function: get_category_report_proc() + get_top_categories()'
         }
       });
 
     } catch (error) {
-      strapi.log.error('Error calling procedure:', error);
-      return ctx.internalServerError(`Failed to call procedure: ${error.message}`);
+      strapi.log.error('Error calling function:', error);
+      return ctx.internalServerError(`Failed to call function: ${error.message}`);
     }
   },
 
@@ -136,8 +139,8 @@ export default factories.createCoreController('api::category.category', ({ strap
       
       if (error.message.includes('does not exist')) {
         return ctx.badRequest({
-          message: 'Stored procedure chưa được tạo',
-          guide: 'Xem file: database/SETUP_PROCEDURES_GUIDE.sql'
+          message: 'Stored function chưa được tạo',
+          guide: 'Xem file: database/OPTIMIZED_PROCEDURES_TABLE_VERSION.sql'
         });
       }
 
