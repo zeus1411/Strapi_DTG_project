@@ -4,10 +4,16 @@ services:
     image: postgres:16-alpine
     container_name: strapi_postgres
     restart: unless-stopped
+    env_file:
+      - .env.docker
     environment:
       POSTGRES_DB: ${DATABASE_NAME:-strapi}
       POSTGRES_USER: ${DATABASE_USERNAME:-strapi}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-strapi}
+      # Force UTF-8 encoding for Vietnamese characters
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C.UTF-8"
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
     volumes:
       - postgres_data:/var/lib/postgresql/data
       # Note: SQL scripts in ./database folder require tables created by Strapi first
@@ -27,10 +33,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NODE_ENV: ${NODE_ENV:-development}
     container_name: strapi_backend
     restart: unless-stopped
+    env_file:
+      - .env.docker
     environment:
-      NODE_ENV: ${NODE_ENV:-production}
+      NODE_ENV: ${NODE_ENV:-development}
       DATABASE_CLIENT: postgres
       DATABASE_HOST: postgres
       DATABASE_PORT: ${DATABASE_PORT:-5432}

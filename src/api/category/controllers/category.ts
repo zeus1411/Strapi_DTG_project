@@ -6,61 +6,40 @@ export default factories.createCoreController('api::category.category', ({ strap
   async getCategoryReport(ctx) {
     try {
       const user = ctx.state.user;
-      strapi.log.info(`User accessing Category Report: ${user?.email || 'Public'}`);
+      const { limit = 50, activeOnly = 'true', sortBy = 'order' } = ctx.query;
 
-      // ✅ Query 1: Get report statistics (TABLE - 1 row)
-      const reportResult = await strapi.db.connection.raw(
-        'SELECT * FROM get_category_report()'
-      );
+      // Validation
+      const limitNum = Math.min(Math.max(parseInt(String(limit)) || 50, 1), 1000);
+      const isActiveOnly = activeOnly === 'true' || activeOnly === true;
+      const validSortBy = ['name', 'order', 'slug'].includes(String(sortBy)) ? String(sortBy) : 'order';
 
-      // ✅ Query 2: Get top categories (TABLE - nhiều rows)
-      const topCategoriesResult = await strapi.db.connection.raw(
-        'SELECT * FROM get_top_categories(?)',
-        [50] // Limit 50 categories
-      );
+      // Query database
+      const [reportResult, topCategoriesResult] = await Promise.all([
+        strapi.db.connection.raw('SELECT * FROM get_category_report()'),
+        strapi.db.connection.raw('SELECT * FROM get_top_categories(?, ?, ?)', [limitNum, isActiveOnly, validSortBy])
+      ]);
 
       const reportData = reportResult.rows[0];
-      const topCategories = topCategoriesResult.rows;
-
       if (!reportData) {
-        return ctx.notFound({
-          message: 'Function chưa được tạo hoặc không có data',
-          guide: 'Xem file: database/OPTIMIZED_PROCEDURES_TABLE_VERSION.sql'
-        });
+        return ctx.notFound('Function chưa được tạo hoặc không có data');
       }
 
       return ctx.send({
         success: true,
-        data: {
-          ...reportData,  // ⭐ Spread stats: total_categories, active_categories, etc.
-          topCategories   // ⭐ Array of top categories
-        },
+        data: { ...reportData, topCategories: topCategoriesResult.rows },
         meta: {
           generatedAt: new Date().toISOString(),
-          user: user ? { email: user.email } : 'Public',
-          source: 'PostgreSQL Functions: get_category_report() + get_top_categories()'
+          user: user?.email || 'Public',
+          filters: { limit: limitNum, activeOnly: isActiveOnly, sortBy: validSortBy },
+          availableSorts: ['name', 'order', 'slug']
         }
       });
 
     } catch (error) {
-      strapi.log.error('Error getting category report:', error);
-      
-      // Friendly error message
-      if (error.message.includes('does not exist')) {
-        return ctx.badRequest({
-          message: 'Stored function chưa được tạo trong database',
-          solution: 'Làm theo hướng dẫn trong: database/OPTIMIZED_PROCEDURES_TABLE_VERSION.sql',
-          steps: [
-            '1. Mở pgAdmin4',
-            '2. Connect vào database: testing_strapi_2',
-            '3. Query Tool → Copy SQL từ file OPTIMIZED_PROCEDURES_TABLE_VERSION.sql',
-            '4. Execute để tạo functions',
-            '5. Thử lại API này'
-          ]
-        });
-      }
-
-      return ctx.internalServerError(`Failed to get report: ${error.message}`);
+      strapi.log.error('Category report error:', error);
+      return error.message.includes('does not exist')
+        ? ctx.badRequest('Stored function chưa được tạo. Xem: database/OPTIMIZED_PROCEDURES_TABLE_VERSION.sql')
+        : ctx.internalServerError(`Failed to get report: ${error.message}`);
     }
   },
 
@@ -70,16 +49,23 @@ export default factories.createCoreController('api::category.category', ({ strap
   async getCategoryReportProc(ctx) {
     try {
       const user = ctx.state.user;
+      const { limit = 50, activeOnly = 'true', sortBy = 'order' } = ctx.query;
+
+      // Validation
+      const limitNum = Math.min(Math.max(parseInt(String(limit)) || 50, 1), 1000);
+      const isActiveOnly = activeOnly === 'true' || activeOnly === true;
+      const validSortBy = ['name', 'order', 'slug'].includes(String(sortBy)) ? String(sortBy) : 'order';
+      
       strapi.log.info(`User accessing Category Report PROC: ${user?.email || 'Public'}`);
       
-      // ✅ Giờ là function, gọi đơn giản như get_category_report
+      // Query database
       const reportResult = await strapi.db.connection.raw(
         'SELECT * FROM get_category_report_proc()'
       );
 
       const topCategoriesResult = await strapi.db.connection.raw(
-        'SELECT * FROM get_top_categories(?)',
-        [50]
+        'SELECT * FROM get_top_categories(?, ?, ?)',
+        [limitNum, isActiveOnly, validSortBy]
       );
 
       const reportData = reportResult.rows[0];
@@ -100,7 +86,9 @@ export default factories.createCoreController('api::category.category', ({ strap
         },
         meta: {
           generatedAt: new Date().toISOString(),
-          user: user ? { email: user.email } : 'Public',
+          user: user?.email || 'Public',
+          filters: { limit: limitNum, activeOnly: isActiveOnly, sortBy: validSortBy },
+          availableSorts: ['name', 'order', 'slug'],
           source: 'PostgreSQL Function: get_category_report_proc() + get_top_categories()'
         }
       });
@@ -116,12 +104,16 @@ export default factories.createCoreController('api::category.category', ({ strap
    */
   async getCategoryDetails(ctx) {
     try {
-      const { activeOnly = true, limit = 10 } = ctx.query;
+      const { activeOnly = 'true', limit = 10 } = ctx.query;
 
-      // Gọi procedure với parameters
+      // Validation
+      const limitNum = Math.min(Math.max(parseInt(String(limit)) || 10, 1), 1000);
+      const isActiveOnly = activeOnly === 'true' || activeOnly === true;
+
+      // Gọi function với parameters
       const result = await strapi.db.connection.raw(
         'SELECT * FROM get_category_details(?, ?)',
-        [activeOnly === 'true' || activeOnly === true, parseInt(String(limit)) || 10]
+        [isActiveOnly, limitNum]
       );
 
       return ctx.send({
@@ -129,8 +121,8 @@ export default factories.createCoreController('api::category.category', ({ strap
         data: result.rows,
         meta: {
           count: result.rows.length,
-          filters: { activeOnly, limit },
-          source: 'PostgreSQL Stored Procedure: get_category_details()'
+          filters: { activeOnly: isActiveOnly, limit: limitNum },
+          source: 'PostgreSQL Function: get_category_details()'
         }
       });
 

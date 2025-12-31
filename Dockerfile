@@ -10,12 +10,12 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Set environment to production
-ARG NODE_ENV=production
+# Set environment (can be overridden via docker-compose build args)
+ARG NODE_ENV=development
 ENV NODE_ENV=${NODE_ENV}
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm ci
 
 # Copy project files
 COPY . .
@@ -27,4 +27,4 @@ RUN npm run build
 EXPOSE 1337
 
 # Start Strapi
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "develop"]
