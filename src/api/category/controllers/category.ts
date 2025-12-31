@@ -56,16 +56,22 @@ export default factories.createCoreController('api::category.category', ({ strap
       const isActiveOnly = activeOnly === 'true' || activeOnly === true;
       const validSortBy = ['name', 'order', 'slug'].includes(String(sortBy)) ? String(sortBy) : 'order';
       
-      strapi.log.info(`User accessing Category Report PROC: ${user?.email || 'Public'}`);
+      strapi.log.info(`User accessing REAL PROCEDURE: ${user?.email || 'Public'}`);
       
-      // Query database
-      const reportResult = await strapi.db.connection.raw(
-        'SELECT * FROM get_category_report_proc()'
+      // ✅ BƯỚC 1: Gọi PROCEDURE (tạo temp tables)
+      await strapi.db.connection.raw(
+        'CALL get_category_report_proc(?, ?, ?)',
+        [limitNum, isActiveOnly, validSortBy]
       );
 
+      // ✅ BƯỚC 2: Query temp table 1 (statistics)
+      const reportResult = await strapi.db.connection.raw(
+        'SELECT * FROM temp_proc_report_stats'
+      );
+
+      // ✅ BƯỚC 3: Query temp table 2 (top categories)
       const topCategoriesResult = await strapi.db.connection.raw(
-        'SELECT * FROM get_top_categories(?, ?, ?)',
-        [limitNum, isActiveOnly, validSortBy]
+        'SELECT * FROM temp_proc_top_categories'
       );
 
       const reportData = reportResult.rows[0];
@@ -98,6 +104,7 @@ export default factories.createCoreController('api::category.category', ({ strap
       return ctx.internalServerError(`Failed to call function: ${error.message}`);
     }
   },
+
 
   /**
    * CATEGORY DETAILS - Với Parameters
