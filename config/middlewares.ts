@@ -9,4 +9,5 @@ export default [
   'strapi::session',
   'strapi::favicon',
   'strapi::public',
+  'global::cache', // Redis cache middleware - reads rules from DB
 ];

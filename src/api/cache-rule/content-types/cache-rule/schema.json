@@ -1,0 +1,58 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cache_rules",
+  "info": {
+    "singularName": "cache-rule",
+    "pluralName": "cache-rules",
+    "displayName": "Cache Rule",
+    "description": "Manage API caching rules via Admin Panel"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "description": "Rule name (e.g., Course List)"
+    },
+    "routePattern": {
+      "type": "string",
+      "required": true,
+      "description": "Route pattern to match (e.g., /api/courses, /api/products/*)"
+    },
+    "method": {
+      "type": "enumeration",
+      "enum": ["GET"],
+      "default": "GET",
+      "required": true
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    },
+    "ttl": {
+      "type": "integer",
+      "default": 300,
+      "min": 0,
+      "max": 86400,
+      "description": "Cache TTL in seconds (0 = forever, max 24h)"
+    },
+    "priority": {
+      "type": "integer",
+      "default": 100,
+      "description": "Rule priority (higher = checked first)"
+    },
+    "description": {
+      "type": "text",
+      "description": "Rule description"
+    },
+    "statistics": {
+      "type": "json",
+      "description": "Cache hit/miss statistics (auto-updated)"
+    }
+  }
+}

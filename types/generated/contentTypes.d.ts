@@ -430,6 +430,56 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiCacheRuleCacheRule extends Struct.CollectionTypeSchema {
+  collectionName: 'cache_rules';
+  info: {
+    description: 'Manage API caching rules via Admin Panel';
+    displayName: 'Cache Rule';
+    pluralName: 'cache-rules';
+    singularName: 'cache-rule';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
+    enabled: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::cache-rule.cache-rule'
+    > &
+      Schema.Attribute.Private;
+    method: Schema.Attribute.Enumeration<['GET']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'GET'>;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    priority: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<100>;
+    publishedAt: Schema.Attribute.DateTime;
+    routePattern: Schema.Attribute.String & Schema.Attribute.Required;
+    statistics: Schema.Attribute.JSON;
+    ttl: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 86400;
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<300>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   collectionName: 'categories';
   info: {
@@ -1039,6 +1089,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::cache-rule.cache-rule': ApiCacheRuleCacheRule;
       'api::category.category': ApiCategoryCategory;
       'api::course.course': ApiCourseCourse;
       'api::product.product': ApiProductProduct;
