@@ -9,5 +9,6 @@ export default [
   'strapi::session',
   'strapi::favicon',
   'strapi::public',
+  'global::bucket-selector', // Dynamic bucket selection for uploads
   'global::cache', // Redis cache middleware - reads rules from DB
 ];

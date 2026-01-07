@@ -44,4 +44,31 @@ export default () => ({
       ],
     },
   },
+  
+  // MinIO Upload Configuration
+  upload: {
+    config: {
+      provider: 'aws-s3',
+      providerOptions: {
+        s3Options: {
+          credentials: {
+            accessKeyId: process.env.MINIO_ROOT_USER,
+            secretAccessKey: process.env.MINIO_ROOT_PASSWORD,
+          },
+          endpoint: `http://${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}`,
+          region: process.env.MINIO_REGION,
+          forcePathStyle: true, // Required for MinIO
+        },
+        // Upload parameters (default to public bucket)
+        params: {
+          Bucket: process.env.MINIO_BUCKET_PUBLIC,
+        },
+      },
+      actionOptions: {
+        upload: {},
+        uploadStream: {},
+        delete: {},
+      },
+    },
+  },
 });
