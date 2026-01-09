@@ -2,151 +2,106 @@ import { factories } from '@strapi/strapi';
 import fs from 'fs';
 import path from 'path';
 
+// Helper: Get function/procedure metadata from PostgreSQL catalog
+async function getFunctionMetadata(functionName: string) {
+  try {
+    const result = await strapi.db.connection.raw(`
+      SELECT 
+        p.proname as function_name,
+        p.prokind as kind,
+        p.pronargs as num_params,
+        COALESCE(
+          (SELECT ARRAY_AGG(format_type(t.oid, NULL) ORDER BY ord)
+           FROM unnest(p.proargtypes) WITH ORDINALITY AS t(oid, ord)),
+          ARRAY[]::text[]
+        ) as param_types,
+        COALESCE(
+          (SELECT ARRAY_AGG(p.proargnames[ord] ORDER BY ord)
+           FROM unnest(p.proargtypes) WITH ORDINALITY AS t(oid, ord)),
+          ARRAY[]::text[]
+        ) as param_names
+      FROM pg_proc p
+      JOIN pg_namespace n ON p.pronamespace = n.oid
+      WHERE n.nspname = 'public' 
+        AND p.proname = ?
+      LIMIT 1
+    `, [functionName]);
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    const metadata = result.rows[0];
+    const paramNames = metadata.param_names || [];
+    const paramTypes = metadata.param_types || [];
+    
+    return {
+      functionName: metadata.function_name,
+      kind: metadata.kind, // 'f' = function, 'p' = procedure
+      isFunction: metadata.kind === 'f',
+      isProcedure: metadata.kind === 'p',
+      numParams: metadata.num_params,
+      parameters: paramNames.map((name: string, index: number) => ({
+        name,
+        type: paramTypes[index] || 'unknown',
+        position: index + 1
+      }))
+    };
+  } catch (error) {
+    strapi.log.error('Error getting function metadata:', error);
+    return null;
+  }
+}
+
+// Helper: Convert parameter type
+function convertParamType(value: any, type: string) {
+  if (value === null || value === undefined) return null;
+  
+  const typeStr = String(type).toLowerCase();
+  
+  if (typeStr.includes('int') || typeStr.includes('serial')) {
+    const num = Number(value);
+    return isNaN(num) ? null : num;
+  }
+  
+  if (typeStr.includes('numeric') || typeStr.includes('decimal') || typeStr.includes('real') || typeStr.includes('double')) {
+    const num = Number(value);
+    return isNaN(num) ? null : num;
+  }
+  
+  if (typeStr.includes('bool')) {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'true' || value === '1';
+    }
+    return Boolean(value);
+  }
+  
+  if (typeStr.includes('date') || typeStr.includes('time')) {
+    return value;
+  }
+  
+  return String(value);
+}
+
+// Helper: Map named parameters to positional parameters
+function mapNamedToPositionalParams(namedParams: any, parameterMetadata: any[]) {
+  const orderedParams: any[] = [];
+  
+  for (const paramInfo of parameterMetadata) {
+    const value = namedParams[paramInfo.name];
+    
+    if (value === undefined || value === null) {
+      orderedParams.push(null);
+    } else {
+      orderedParams.push(convertParamType(value, paramInfo.type));
+    }
+  }
+  
+  return orderedParams;
+}
+
 export default factories.createCoreController('api::category.category', ({ strapi }) => ({
-  async getCategoryReport(ctx) {
-    try {
-      const user = ctx.state.user;
-      const { limit = 50, activeOnly = 'true', sortBy = 'order' } = ctx.query;
-
-      // Validation
-      const limitNum = Math.min(Math.max(parseInt(String(limit)) || 50, 1), 1000);
-      const isActiveOnly = activeOnly === 'true' || activeOnly === true;
-      const validSortBy = ['name', 'order', 'slug'].includes(String(sortBy)) ? String(sortBy) : 'order';
-
-      // Query database
-      const [reportResult, topCategoriesResult] = await Promise.all([
-        strapi.db.connection.raw('SELECT * FROM get_category_report()'),
-        strapi.db.connection.raw('SELECT * FROM get_top_categories(?, ?, ?)', [limitNum, isActiveOnly, validSortBy])
-      ]);
-
-      const reportData = reportResult.rows[0];
-      if (!reportData) {
-        return ctx.notFound('Function chưa được tạo hoặc không có data');
-      }
-
-      return ctx.send({
-        success: true,
-        data: { ...reportData, topCategories: topCategoriesResult.rows },
-        meta: {
-          generatedAt: new Date().toISOString(),
-          user: user?.email || 'Public',
-          filters: { limit: limitNum, activeOnly: isActiveOnly, sortBy: validSortBy },
-          availableSorts: ['name', 'order', 'slug']
-        }
-      });
-
-    } catch (error) {
-      strapi.log.error('Category report error:', error);
-      return error.message.includes('does not exist')
-        ? ctx.badRequest('Stored function chưa được tạo. Xem: database/OPTIMIZED_PROCEDURES_TABLE_VERSION.sql')
-        : ctx.internalServerError(`Failed to get report: ${error.message}`);
-    }
-  },
-
-  /**
-   * CATEGORY REPORT PROC - gọi FUNCTION (TABLE version)
-   */
-  async getCategoryReportProc(ctx) {
-    try {
-      const user = ctx.state.user;
-      const { limit = 50, activeOnly = 'true', sortBy = 'order' } = ctx.query;
-
-      // Validation
-      const limitNum = Math.min(Math.max(parseInt(String(limit)) || 50, 1), 1000);
-      const isActiveOnly = activeOnly === 'true' || activeOnly === true;
-      const validSortBy = ['name', 'order', 'slug'].includes(String(sortBy)) ? String(sortBy) : 'order';
-      
-      strapi.log.info(`User accessing REAL PROCEDURE: ${user?.email || 'Public'}`);
-      
-      // ✅ BƯỚC 1: Gọi PROCEDURE (tạo temp tables)
-      await strapi.db.connection.raw(
-        'CALL get_category_report_proc(?, ?, ?)',
-        [limitNum, isActiveOnly, validSortBy]
-      );
-
-      // ✅ BƯỚC 2: Query temp table 1 (statistics)
-      const reportResult = await strapi.db.connection.raw(
-        'SELECT * FROM temp_proc_report_stats'
-      );
-
-      // ✅ BƯỚC 3: Query temp table 2 (top categories)
-      const topCategoriesResult = await strapi.db.connection.raw(
-        'SELECT * FROM temp_proc_top_categories'
-      );
-
-      const reportData = reportResult.rows[0];
-      const topCategories = topCategoriesResult.rows;
-
-      if (!reportData) {
-        return ctx.notFound({
-          message: 'Function chưa được tạo hoặc không có data',
-          guide: 'Xem file: database/OPTIMIZED_PROCEDURES_TABLE_VERSION.sql'
-        });
-      }
-
-      return ctx.send({
-        success: true,
-        data: {
-          ...reportData,
-          topCategories
-        },
-        meta: {
-          generatedAt: new Date().toISOString(),
-          user: user?.email || 'Public',
-          filters: { limit: limitNum, activeOnly: isActiveOnly, sortBy: validSortBy },
-          availableSorts: ['name', 'order', 'slug'],
-          source: 'PostgreSQL Function: get_category_report_proc() + get_top_categories()'
-        }
-      });
-
-    } catch (error) {
-      strapi.log.error('Error calling function:', error);
-      return ctx.internalServerError(`Failed to call function: ${error.message}`);
-    }
-  },
-
-
-  /**
-   * CATEGORY DETAILS - Với Parameters
-   */
-  async getCategoryDetails(ctx) {
-    try {
-      const { activeOnly = 'true', limit = 10 } = ctx.query;
-
-      // Validation
-      const limitNum = Math.min(Math.max(parseInt(String(limit)) || 10, 1), 1000);
-      const isActiveOnly = activeOnly === 'true' || activeOnly === true;
-
-      // Gọi function với parameters
-      const result = await strapi.db.connection.raw(
-        'SELECT * FROM get_category_details(?, ?)',
-        [isActiveOnly, limitNum]
-      );
-
-      return ctx.send({
-        success: true,
-        data: result.rows,
-        meta: {
-          count: result.rows.length,
-          filters: { activeOnly: isActiveOnly, limit: limitNum },
-          source: 'PostgreSQL Function: get_category_details()'
-        }
-      });
-
-    } catch (error) {
-      strapi.log.error('Error getting category details:', error);
-      
-      if (error.message.includes('does not exist')) {
-        return ctx.badRequest({
-          message: 'Stored function chưa được tạo',
-          guide: 'Xem file: database/OPTIMIZED_PROCEDURES_TABLE_VERSION.sql'
-        });
-      }
-
-      return ctx.internalServerError(`Failed to get details: ${error.message}`);
-    }
-  },
-
   /**
    * CUSTOM API - Đọc categories từ file JSON
    * Custom API với permission checking
@@ -293,6 +248,212 @@ export default factories.createCoreController('api::category.category', ({ strap
     } catch (error) {
       strapi.log.error('Error importing categories:', error);
       return ctx.internalServerError('Failed to import categories');
+    }
+  },
+
+  /**
+   * GENERIC DATABASE FUNCTION CALLER - GET
+   */
+  async callDatabaseFunction(ctx) {
+    try {
+      const { functionName, params } = ctx.query;
+
+      if (!functionName) {
+        return ctx.badRequest('Missing functionName parameter');
+      }
+
+      let parsedParams = {};
+      if (params) {
+        try {
+          parsedParams = typeof params === 'string' ? JSON.parse(params) : params;
+        } catch (e) {
+          return ctx.badRequest(`Invalid JSON in params: ${e.message}`);
+        }
+      }
+
+      const functionMetadata = await getFunctionMetadata(String(functionName));
+      
+      if (!functionMetadata) {
+        return ctx.notFound(`Function or Procedure '${functionName}' not found in database`);
+      }
+
+      const orderedParams = mapNamedToPositionalParams(parsedParams, functionMetadata.parameters);
+      
+      let result;
+      
+      if (functionMetadata.isFunction) {
+        // Function: SELECT * FROM function_name(params)
+        const placeholders = orderedParams.map(() => '?').join(', ');
+        const query = `SELECT * FROM ${functionName}(${placeholders})`;
+        result = await strapi.db.connection.raw(query, orderedParams);
+      } else if (functionMetadata.isProcedure) {
+        // Procedure: CALL procedure_name(params) + query temp tables
+        const placeholders = orderedParams.map(() => '?').join(', ');
+        const callQuery = `CALL ${functionName}(${placeholders})`;
+        
+        // Execute procedure
+        await strapi.db.connection.raw(callQuery, orderedParams);
+        
+        // Query temp tables with naming convention
+        const tempTables = [
+          `temp_proc_report_stats`,
+          `temp_proc_top_categories`,
+          `temp_proc_${functionName}_result`
+        ];
+        
+        const tempData: any = {};
+        for (const tableName of tempTables) {
+          try {
+            const tempResult = await strapi.db.connection.raw(`SELECT * FROM ${tableName}`);
+            if (tempResult.rows && tempResult.rows.length > 0) {
+              tempData[tableName.replace('temp_proc_', '')] = tempResult.rows;
+            }
+          } catch (e) {
+            // Table doesn't exist, skip
+          }
+        }
+        
+        if (Object.keys(tempData).length === 0) {
+          return ctx.send({
+            success: true,
+            message: 'Procedure executed successfully',
+            meta: {
+              functionName,
+              type: 'procedure',
+              parametersUsed: parsedParams,
+              note: 'Procedure executed but no standard temp tables found'
+            }
+          });
+        }
+        
+        return ctx.send({
+          success: true,
+          data: tempData,
+          meta: {
+            functionName,
+            type: 'procedure',
+            parametersUsed: parsedParams,
+            generatedAt: new Date().toISOString()
+          }
+        });
+      }
+
+      return ctx.send({
+        success: true,
+        data: result.rows,
+        meta: {
+          functionName,
+          type: 'function',
+          parametersUsed: parsedParams,
+          resultCount: result.rows.length,
+          generatedAt: new Date().toISOString()
+        }
+      });
+
+    } catch (error) {
+      strapi.log.error('Error calling database function:', error);
+      return ctx.internalServerError(`Failed to call function: ${error.message}`);
+    }
+  },
+
+  /**
+   * GENERIC DATABASE FUNCTION CALLER - POST
+   */
+  async callDatabaseFunctionPost(ctx) {
+    try {
+      const { functionName, params } = ctx.request.body;
+
+      if (!functionName) {
+        return ctx.badRequest('Missing functionName in request body');
+      }
+
+      let parsedParams = {};
+      if (params) {
+        parsedParams = typeof params === 'string' ? JSON.parse(params) : params;
+      }
+
+      const functionMetadata = await getFunctionMetadata(String(functionName));
+      
+      if (!functionMetadata) {
+        return ctx.notFound(`Function or Procedure '${functionName}' not found in database`);
+      }
+
+      const orderedParams = mapNamedToPositionalParams(parsedParams, functionMetadata.parameters);
+      
+      let result;
+      
+      if (functionMetadata.isFunction) {
+        // Function: SELECT * FROM function_name(params)
+        const placeholders = orderedParams.map(() => '?').join(', ');
+        const query = `SELECT * FROM ${functionName}(${placeholders})`;
+        result = await strapi.db.connection.raw(query, orderedParams);
+      } else if (functionMetadata.isProcedure) {
+        // Procedure: CALL procedure_name(params) + query temp tables
+        const placeholders = orderedParams.map(() => '?').join(', ');
+        const callQuery = `CALL ${functionName}(${placeholders})`;
+        
+        // Execute procedure
+        await strapi.db.connection.raw(callQuery, orderedParams);
+        
+        // Query temp tables with naming convention
+        const tempTables = [
+          `temp_proc_report_stats`,
+          `temp_proc_top_categories`,
+          `temp_proc_${functionName}_result`
+        ];
+        
+        const tempData: any = {};
+        for (const tableName of tempTables) {
+          try {
+            const tempResult = await strapi.db.connection.raw(`SELECT * FROM ${tableName}`);
+            if (tempResult.rows && tempResult.rows.length > 0) {
+              tempData[tableName.replace('temp_proc_', '')] = tempResult.rows;
+            }
+          } catch (e) {
+            // Table doesn't exist, skip
+          }
+        }
+        
+        if (Object.keys(tempData).length === 0) {
+          return ctx.send({
+            success: true,
+            message: 'Procedure executed successfully',
+            meta: {
+              functionName,
+              type: 'procedure',
+              parametersUsed: parsedParams,
+              note: 'Procedure executed but no standard temp tables found'
+            }
+          });
+        }
+        
+        return ctx.send({
+          success: true,
+          data: tempData,
+          meta: {
+            functionName,
+            type: 'procedure',
+            parametersUsed: parsedParams,
+            generatedAt: new Date().toISOString()
+          }
+        });
+      }
+
+      return ctx.send({
+        success: true,
+        data: result.rows,
+        meta: {
+          functionName,
+          type: 'function',
+          parametersUsed: parsedParams,
+          resultCount: result.rows.length,
+          generatedAt: new Date().toISOString()
+        }
+      });
+
+    } catch (error) {
+      strapi.log.error('Error calling database function (POST):', error);
+      return ctx.internalServerError(`Failed to call function: ${error.message}`);
     }
   }
 }));

@@ -1,47 +1,5 @@
 export default {
   routes: [
-    // CATEGORY REPORT - Stored Procedure Demo
-    {
-      method: 'GET',
-      path: '/categories/report',
-      handler: 'category.getCategoryReport',
-      config: {
-        description: 'Get category report (using FUNCTION)',
-        tag: {
-          plugin: 'api',
-          name: 'Category Report'
-        }
-      }
-    },
-
-    // CATEGORY REPORT PROC - Demo gọi PROCEDURE thực sự
-    {
-      method: 'GET',
-      path: '/categories/report-proc',
-      handler: 'category.getCategoryReportProc',
-      config: {
-        description: 'Get category report (using PROCEDURE)',
-        tag: {
-          plugin: 'api',
-          name: 'Category Report'
-        }
-      }
-    },
-
-    // CATEGORY DETAILS - Stored Procedure với Parameters
-    {
-      method: 'GET',
-      path: '/categories/details',
-      handler: 'category.getCategoryDetails',
-      config: {
-        description: 'Get category details with filters (using Function)',
-        tag: {
-          plugin: 'api',
-          name: 'Category Report'
-        }
-      }
-    },
-
     // PUBLIC API - Không cần authentication
     {
       method: 'GET',
@@ -67,6 +25,36 @@ export default {
         tag: {
           plugin: 'api',
           name: 'Category'
+        }
+      }
+    },
+
+    // GENERIC DATABASE FUNCTION CALLER - GET
+    {
+      method: 'GET',
+      path: '/categories/db/call-function',
+      handler: 'category.callDatabaseFunction',
+      config: {
+        auth: false,
+        description: 'Generic database function caller (GET) - Named Parameters',
+        tag: {
+          plugin: 'api',
+          name: 'Database Functions'
+        }
+      }
+    },
+
+    // GENERIC DATABASE FUNCTION CALLER - POST
+    {
+      method: 'POST',
+      path: '/categories/db/call-function',
+      handler: 'category.callDatabaseFunctionPost',
+      config: {
+        auth: false,
+        description: 'Generic database function caller (POST) - Named Parameters',
+        tag: {
+          plugin: 'api',
+          name: 'Database Functions'
         }
       }
     }
