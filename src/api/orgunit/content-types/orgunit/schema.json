@@ -1,10 +1,10 @@
 {
   "kind": "collectionType",
-  "collectionName": "departments",
+  "collectionName": "orgunits",
   "info": {
-    "singularName": "department",
-    "pluralName": "departments",
-    "displayName": "Department"
+    "singularName": "orgunit",
+    "pluralName": "orgunits",
+    "displayName": "Orgunit"
   },
   "options": {
     "draftAndPublish": false
@@ -26,7 +26,7 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "plugin::users-permissions.user",
-      "mappedBy": "department"
+      "mappedBy": "orgunit"
     }
   }
 }

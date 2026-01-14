@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-01-12T07:46:43.987Z"
+    "x-generation-date": "2026-01-14T03:48:14.807Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -1055,7 +1055,7 @@
         "operationId": "delete/courses/{id}"
       }
     },
-    "/departments": {
+    "/orgunits": {
       "get": {
         "responses": {
           "200": {
@@ -1063,7 +1063,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DepartmentListResponse"
+                  "$ref": "#/components/schemas/OrgunitListResponse"
                 }
               }
             }
@@ -1120,7 +1120,7 @@
           }
         },
         "tags": [
-          "Department"
+          "Orgunit"
         ],
         "parameters": [
           {
@@ -1226,7 +1226,7 @@
             }
           }
         ],
-        "operationId": "get/departments"
+        "operationId": "get/orgunits"
       },
       "post": {
         "responses": {
@@ -1235,7 +1235,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DepartmentResponse"
+                  "$ref": "#/components/schemas/OrgunitResponse"
                 }
               }
             }
@@ -1292,23 +1292,23 @@
           }
         },
         "tags": [
-          "Department"
+          "Orgunit"
         ],
         "parameters": [],
-        "operationId": "post/departments",
+        "operationId": "post/orgunits",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DepartmentRequest"
+                "$ref": "#/components/schemas/OrgunitRequest"
               }
             }
           }
         }
       }
     },
-    "/departments/{id}": {
+    "/orgunits/{id}": {
       "get": {
         "responses": {
           "200": {
@@ -1316,7 +1316,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DepartmentResponse"
+                  "$ref": "#/components/schemas/OrgunitResponse"
                 }
               }
             }
@@ -1373,7 +1373,7 @@
           }
         },
         "tags": [
-          "Department"
+          "Orgunit"
         ],
         "parameters": [
           {
@@ -1387,7 +1387,7 @@
             }
           }
         ],
-        "operationId": "get/departments/{id}"
+        "operationId": "get/orgunits/{id}"
       },
       "put": {
         "responses": {
@@ -1396,7 +1396,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DepartmentResponse"
+                  "$ref": "#/components/schemas/OrgunitResponse"
                 }
               }
             }
@@ -1453,7 +1453,7 @@
           }
         },
         "tags": [
-          "Department"
+          "Orgunit"
         ],
         "parameters": [
           {
@@ -1467,13 +1467,13 @@
             }
           }
         ],
-        "operationId": "put/departments/{id}",
+        "operationId": "put/orgunits/{id}",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DepartmentRequest"
+                "$ref": "#/components/schemas/OrgunitRequest"
               }
             }
           }
@@ -1544,7 +1544,7 @@
           }
         },
         "tags": [
-          "Department"
+          "Orgunit"
         ],
         "parameters": [
           {
@@ -1558,7 +1558,7 @@
             }
           }
         ],
-        "operationId": "delete/departments/{id}"
+        "operationId": "delete/orgunits/{id}"
       }
     },
     "/products": {
@@ -4503,7 +4503,7 @@
           }
         }
       },
-      "DepartmentRequest": {
+      "OrgunitRequest": {
         "type": "object",
         "required": [
           "data"
@@ -4560,13 +4560,13 @@
           }
         }
       },
-      "DepartmentListResponse": {
+      "OrgunitListResponse": {
         "type": "object",
         "properties": {
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Department"
+              "$ref": "#/components/schemas/Orgunit"
             }
           },
           "meta": {
@@ -4595,7 +4595,7 @@
           }
         }
       },
-      "Department": {
+      "Orgunit": {
         "type": "object",
         "required": [
           "name",
@@ -5066,7 +5066,7 @@
                     }
                   }
                 },
-                "department": {
+                "orgunit": {
                   "type": "object",
                   "properties": {
                     "id": {
@@ -5258,11 +5258,11 @@
           }
         }
       },
-      "DepartmentResponse": {
+      "OrgunitResponse": {
         "type": "object",
         "properties": {
           "data": {
-            "$ref": "#/components/schemas/Department"
+            "$ref": "#/components/schemas/Orgunit"
           },
           "meta": {
             "type": "object"

@@ -66,10 +66,10 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "department": {
+    "orgunit": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::department.department",
+      "target": "api::orgunit.orgunit",
       "inversedBy": "users"
     }
   }

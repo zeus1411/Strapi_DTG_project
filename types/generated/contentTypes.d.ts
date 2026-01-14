@@ -547,12 +547,12 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiDepartmentDepartment extends Struct.CollectionTypeSchema {
-  collectionName: 'departments';
+export interface ApiOrgunitOrgunit extends Struct.CollectionTypeSchema {
+  collectionName: 'orgunits';
   info: {
-    displayName: 'Department';
-    pluralName: 'departments';
-    singularName: 'department';
+    displayName: 'Orgunit';
+    pluralName: 'orgunits';
+    singularName: 'orgunit';
   };
   options: {
     draftAndPublish: false;
@@ -566,7 +566,7 @@ export interface ApiDepartmentDepartment extends Struct.CollectionTypeSchema {
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
-      'api::department.department'
+      'api::orgunit.orgunit'
     > &
       Schema.Attribute.Private;
     name: Schema.Attribute.String & Schema.Attribute.Required;
@@ -1076,10 +1076,6 @@ export interface PluginUsersPermissionsUser
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    department: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::department.department'
-    >;
     email: Schema.Attribute.Email &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
@@ -1091,6 +1087,7 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
+    orgunit: Schema.Attribute.Relation<'manyToOne', 'api::orgunit.orgunit'>;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
       Schema.Attribute.SetMinMaxLength<{
@@ -1129,7 +1126,7 @@ declare module '@strapi/strapi' {
       'api::cache-rule.cache-rule': ApiCacheRuleCacheRule;
       'api::category.category': ApiCategoryCategory;
       'api::course.course': ApiCourseCourse;
-      'api::department.department': ApiDepartmentDepartment;
+      'api::orgunit.orgunit': ApiOrgunitOrgunit;
       'api::product.product': ApiProductProduct;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
