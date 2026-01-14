@@ -27,36 +27,6 @@ export default {
           name: 'Category'
         }
       }
-    },
-
-    // GENERIC DATABASE FUNCTION CALLER - GET
-    {
-      method: 'GET',
-      path: '/categories/db/call-function',
-      handler: 'category.callDatabaseFunction',
-      config: {
-        auth: false,
-        description: 'Generic database function caller (GET) - Named Parameters',
-        tag: {
-          plugin: 'api',
-          name: 'Database Functions'
-        }
-      }
-    },
-
-    // GENERIC DATABASE FUNCTION CALLER - POST
-    {
-      method: 'POST',
-      path: '/categories/db/call-function',
-      handler: 'category.callDatabaseFunctionPost',
-      config: {
-        auth: false,
-        description: 'Generic database function caller (POST) - Named Parameters',
-        tag: {
-          plugin: 'api',
-          name: 'Database Functions'
-        }
-      }
     }
   ]
 };
