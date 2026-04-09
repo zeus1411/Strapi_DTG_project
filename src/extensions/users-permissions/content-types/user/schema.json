@@ -71,6 +71,54 @@
       "relation": "manyToOne",
       "target": "api::orgunit.orgunit",
       "inversedBy": "users"
+    },
+    "code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "birthday": {
+      "type": "date"
+    },
+    "gender": {
+      "type": "string"
+    },
+    "enrollments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::enrollment.enrollment",
+      "mappedBy": "userid"
+    },
+    "attendances": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::attendance.attendance",
+      "mappedBy": "userid"
+    },
+    "submissions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::submission.submission",
+      "mappedBy": "userid"
+    },
+    "attempts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::attempt.attempt",
+      "mappedBy": "userid"
+    },
+    "certificates": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::certificate.certificate",
+      "mappedBy": "userid"
+    },
+    "user_competencies": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-competency.user-competency",
+      "mappedBy": "userid"
     }
   }
 }

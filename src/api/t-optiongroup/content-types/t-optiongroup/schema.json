@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "t_optiongroups",
+  "info": {
+    "singularName": "t-optiongroup",
+    "pluralName": "t-optiongroups",
+    "displayName": "t optiongroup"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string",
+      "required": false,
+      "unique": false
+    },
+    "name": {
+      "type": "string"
+    },
+    "config": {
+      "type": "richtext"
+    },
+    "t_options": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::t-option.t-option",
+      "mappedBy": "optiongroupid"
+    }
+  }
+}

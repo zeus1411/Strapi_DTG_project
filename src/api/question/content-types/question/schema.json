@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "questions",
+  "info": {
+    "singularName": "question",
+    "pluralName": "questions",
+    "displayName": "question"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "quizid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::quiz.quiz",
+      "inversedBy": "questions"
+    },
+    "questiontypeoptid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::t-option.t-option",
+      "inversedBy": "questions"
+    },
+    "score": {
+      "type": "decimal"
+    },
+    "orderno": {
+      "type": "string"
+    },
+    "valuelist": {
+      "type": "richtext"
+    },
+    "answer": {
+      "type": "richtext"
+    }
+  }
+}

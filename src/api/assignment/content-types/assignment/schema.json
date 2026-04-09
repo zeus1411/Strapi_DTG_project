@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "assignments",
+  "info": {
+    "singularName": "assignment",
+    "pluralName": "assignments",
+    "displayName": "assignment"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "richtext"
+    },
+    "coursedetailid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::course-detail.course-detail",
+      "inversedBy": "assignments"
+    },
+    "clazzdetailid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::clazz-detail.clazz-detail",
+      "inversedBy": "assignments"
+    },
+    "filename": {
+      "type": "richtext",
+      "maxLength": 1024
+    },
+    "submissions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::submission.submission",
+      "mappedBy": "assignmentid"
+    }
+  }
+}

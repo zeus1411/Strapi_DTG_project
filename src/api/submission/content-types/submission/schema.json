@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "submissions",
+  "info": {
+    "singularName": "submission",
+    "pluralName": "submissions",
+    "displayName": "submission"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "userid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "submissions"
+    },
+    "assignmentid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::assignment.assignment",
+      "inversedBy": "submissions"
+    },
+    "score": {
+      "type": "decimal"
+    },
+    "scoreby": {
+      "type": "string"
+    }
+  }
+}

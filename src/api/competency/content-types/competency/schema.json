@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "competencies",
+  "info": {
+    "singularName": "competency",
+    "pluralName": "competencies",
+    "displayName": "competency"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "competencyleveloptid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::t-option.t-option",
+      "inversedBy": "competencies"
+    },
+    "course_competencies": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::course-competency.course-competency",
+      "mappedBy": "competencyid"
+    },
+    "user_competencies": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-competency.user-competency",
+      "mappedBy": "competencyid"
+    }
+  }
+}

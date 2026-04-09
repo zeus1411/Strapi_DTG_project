@@ -16,8 +16,9 @@ services:
       LANG: C.UTF-8
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # Note: SQL scripts in ./database folder require tables created by Strapi first
-      # Run them manually after Strapi has initialized the database
+      # Auto-run PostgreSQL migrations on container start (only runs once per migration)
+      - ./database/init-migrations.sh:/docker-entrypoint-initdb.d/00-init-migrations.sh:ro
+      - ./database/postgres-functions-procedures:/docker-entrypoint-initdb.d/migrations:ro
     ports:
       - "${DATABASE_PORT:-5432}:5432"
     networks:

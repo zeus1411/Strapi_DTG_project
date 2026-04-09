@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "attendances",
+  "info": {
+    "singularName": "attendance",
+    "pluralName": "attendances",
+    "displayName": "attendance"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "clazzdetailid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::clazz-detail.clazz-detail",
+      "inversedBy": "attendances"
+    },
+    "userid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "attendances"
+    },
+    "attentdate": {
+      "type": "datetime"
+    },
+    "note": {
+      "type": "richtext"
+    }
+  }
+}

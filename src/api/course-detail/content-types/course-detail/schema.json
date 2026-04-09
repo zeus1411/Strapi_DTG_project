@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "course_details",
+  "info": {
+    "singularName": "course-detail",
+    "pluralName": "course-details",
+    "displayName": "courseDetail"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "courseid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::course.course",
+      "inversedBy": "course_details"
+    },
+    "description": {
+      "type": "richtext"
+    },
+    "orderno": {
+      "type": "string"
+    },
+    "assignments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::assignment.assignment",
+      "mappedBy": "coursedetailid"
+    },
+    "quizzes": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::quiz.quiz",
+      "mappedBy": "coursedetailid"
+    }
+  }
+}
