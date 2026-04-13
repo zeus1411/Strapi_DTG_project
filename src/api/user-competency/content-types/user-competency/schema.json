@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "user_competencies",
+  "info": {
+    "singularName": "user-competency",
+    "pluralName": "user-competencies",
+    "displayName": "userCompetency"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "competencyid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::competency.competency",
+      "inversedBy": "user_competencies"
+    },
+    "userid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "user_competencies"
+    },
+    "competencyleveloptid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::t-option.t-option",
+      "inversedBy": "user_competencies"
+    }
+  }
+}

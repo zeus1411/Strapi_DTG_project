@@ -430,6 +430,126 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiAssignmentAssignment extends Struct.CollectionTypeSchema {
+  collectionName: 'assignments';
+  info: {
+    displayName: 'assignment';
+    pluralName: 'assignments';
+    singularName: 'assignment';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    clazzdetailid: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::clazz-detail.clazz-detail'
+    >;
+    code: Schema.Attribute.String;
+    coursedetailid: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::course-detail.course-detail'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.RichText;
+    filename: Schema.Attribute.RichText &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 1024;
+      }>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::assignment.assignment'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    submissions: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::submission.submission'
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiAttemptAttempt extends Struct.CollectionTypeSchema {
+  collectionName: 'attempts';
+  info: {
+    displayName: 'attempt';
+    pluralName: 'attempts';
+    singularName: 'attempt';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    attemptdate: Schema.Attribute.DateTime;
+    attemptno: Schema.Attribute.Integer;
+    code: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::attempt.attempt'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    quizid: Schema.Attribute.Relation<'manyToOne', 'api::quiz.quiz'>;
+    score: Schema.Attribute.Decimal;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    userid: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
+export interface ApiAttendanceAttendance extends Struct.CollectionTypeSchema {
+  collectionName: 'attendances';
+  info: {
+    displayName: 'attendance';
+    pluralName: 'attendances';
+    singularName: 'attendance';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    attentdate: Schema.Attribute.DateTime;
+    clazzdetailid: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::clazz-detail.clazz-detail'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::attendance.attendance'
+    > &
+      Schema.Attribute.Private;
+    note: Schema.Attribute.RichText;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    userid: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiCacheRuleCacheRule extends Struct.CollectionTypeSchema {
   collectionName: 'cache_rules';
   info: {
@@ -480,6 +600,353 @@ export interface ApiCacheRuleCacheRule extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiCertificateCertificate extends Struct.CollectionTypeSchema {
+  collectionName: 'certificates';
+  info: {
+    displayName: 'certificate';
+    pluralName: 'certificates';
+    singularName: 'certificate';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    certtypeoptid: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::t-option.t-option'
+    >;
+    code: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    expireddate: Schema.Attribute.Date;
+    issueddate: Schema.Attribute.Date;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::certificate.certificate'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    userid: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
+export interface ApiClazzDetailClazzDetail extends Struct.CollectionTypeSchema {
+  collectionName: 'clazz_details';
+  info: {
+    displayName: 'clazzDetail';
+    pluralName: 'clazz-details';
+    singularName: 'clazz-detail';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    assignments: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::assignment.assignment'
+    >;
+    attendances: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::attendance.attendance'
+    >;
+    clazzid: Schema.Attribute.Relation<'manyToOne', 'api::clazz.clazz'>;
+    code: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.String;
+    isfinished: Schema.Attribute.Boolean;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::clazz-detail.clazz-detail'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    orderno: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    quizzes: Schema.Attribute.Relation<'oneToMany', 'api::quiz.quiz'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiClazzClazz extends Struct.CollectionTypeSchema {
+  collectionName: 'clazzes';
+  info: {
+    displayName: 'clazz';
+    pluralName: 'clazzes';
+    singularName: 'clazz';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    clazz_details: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::clazz-detail.clazz-detail'
+    >;
+    code: Schema.Attribute.String;
+    courseid: Schema.Attribute.Relation<'manyToOne', 'api::course.course'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.RichText;
+    enddate: Schema.Attribute.Date;
+    enrollments: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::enrollment.enrollment'
+    >;
+    isclosed: Schema.Attribute.Boolean;
+    isfinished: Schema.Attribute.Boolean;
+    isprivate: Schema.Attribute.Boolean;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::clazz.clazz'> &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    strartdate: Schema.Attribute.Date;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiCompetencyCompetency extends Struct.CollectionTypeSchema {
+  collectionName: 'competencies';
+  info: {
+    displayName: 'competency';
+    pluralName: 'competencies';
+    singularName: 'competency';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    code: Schema.Attribute.String;
+    competencyleveloptid: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::t-option.t-option'
+    >;
+    course_competencies: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::course-competency.course-competency'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::competency.competency'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user_competencies: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-competency.user-competency'
+    >;
+  };
+}
+
+export interface ApiCourseCompetencyCourseCompetency
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'course_competencies';
+  info: {
+    displayName: 'courseCompetency';
+    pluralName: 'course-competencies';
+    singularName: 'course-competency';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    competencyid: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::competency.competency'
+    >;
+    competencyleveloptid: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::t-option.t-option'
+    >;
+    courseid: Schema.Attribute.Relation<'manyToOne', 'api::course.course'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::course-competency.course-competency'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiCourseDetailCourseDetail
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'course_details';
+  info: {
+    displayName: 'courseDetail';
+    pluralName: 'course-details';
+    singularName: 'course-detail';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    assignments: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::assignment.assignment'
+    >;
+    code: Schema.Attribute.String;
+    courseid: Schema.Attribute.Relation<'manyToOne', 'api::course.course'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.RichText;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::course-detail.course-detail'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    orderno: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    quizzes: Schema.Attribute.Relation<'oneToMany', 'api::quiz.quiz'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
+  collectionName: 'courses';
+  info: {
+    displayName: 'course';
+    pluralName: 'courses';
+    singularName: 'course';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    clazzes: Schema.Attribute.Relation<'oneToMany', 'api::clazz.clazz'>;
+    code: Schema.Attribute.String;
+    course_competencies: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::course-competency.course-competency'
+    >;
+    course_details: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::course-detail.course-detail'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.RichText;
+    expriments: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::expriment.expriment'
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::course.course'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiEnrollmentEnrollment extends Struct.CollectionTypeSchema {
+  collectionName: 'enrollments';
+  info: {
+    displayName: 'enrollment';
+    pluralName: 'enrollments';
+    singularName: 'enrollment';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    clazzid: Schema.Attribute.Relation<'manyToOne', 'api::clazz.clazz'>;
+    code: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    enrolltime: Schema.Attribute.DateTime;
+    ispassed: Schema.Attribute.Boolean;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::enrollment.enrollment'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    score: Schema.Attribute.Decimal;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    userid: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
+export interface ApiExprimentExpriment extends Struct.CollectionTypeSchema {
+  collectionName: 'expriments';
+  info: {
+    displayName: 'Expriment';
+    pluralName: 'expriments';
+    singularName: 'expriment';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    course: Schema.Attribute.Relation<'manyToOne', 'api::course.course'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::expriment.expriment'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiOrgunitOrgunit extends Struct.CollectionTypeSchema {
   collectionName: 'orgunits';
   info: {
@@ -509,6 +976,247 @@ export interface ApiOrgunitOrgunit extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     users: Schema.Attribute.Relation<
       'oneToMany',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
+export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
+  collectionName: 'questions';
+  info: {
+    displayName: 'question';
+    pluralName: 'questions';
+    singularName: 'question';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    answer: Schema.Attribute.RichText;
+    code: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::question.question'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    orderno: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    questiontypeoptid: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::t-option.t-option'
+    >;
+    quizid: Schema.Attribute.Relation<'manyToOne', 'api::quiz.quiz'>;
+    score: Schema.Attribute.Decimal;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    valuelist: Schema.Attribute.RichText;
+  };
+}
+
+export interface ApiQuizQuiz extends Struct.CollectionTypeSchema {
+  collectionName: 'quizzes';
+  info: {
+    displayName: 'quiz';
+    pluralName: 'quizzes';
+    singularName: 'quiz';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    attemptno: Schema.Attribute.Integer;
+    attempts: Schema.Attribute.Relation<'oneToMany', 'api::attempt.attempt'>;
+    clazzdetailid: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::clazz-detail.clazz-detail'
+    >;
+    code: Schema.Attribute.String;
+    coursedetailid: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::course-detail.course-detail'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.RichText;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::quiz.quiz'> &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    questions: Schema.Attribute.Relation<'oneToMany', 'api::question.question'>;
+    totalscore: Schema.Attribute.Decimal;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiSubmissionSubmission extends Struct.CollectionTypeSchema {
+  collectionName: 'submissions';
+  info: {
+    displayName: 'submission';
+    pluralName: 'submissions';
+    singularName: 'submission';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    assignmentid: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::assignment.assignment'
+    >;
+    code: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::submission.submission'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    score: Schema.Attribute.Decimal;
+    scoreby: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    userid: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
+export interface ApiTOptionTOption extends Struct.CollectionTypeSchema {
+  collectionName: 't_options';
+  info: {
+    displayName: 't option';
+    pluralName: 't-options';
+    singularName: 't-option';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    certificates: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::certificate.certificate'
+    >;
+    code: Schema.Attribute.String;
+    competencies: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::competency.competency'
+    >;
+    config: Schema.Attribute.RichText;
+    course_competencies: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::course-competency.course-competency'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::t-option.t-option'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    optiongroupid: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::t-optiongroup.t-optiongroup'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    questions: Schema.Attribute.Relation<'oneToMany', 'api::question.question'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user_competencies: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-competency.user-competency'
+    >;
+  };
+}
+
+export interface ApiTOptiongroupTOptiongroup
+  extends Struct.CollectionTypeSchema {
+  collectionName: 't_optiongroups';
+  info: {
+    displayName: 't optiongroup';
+    pluralName: 't-optiongroups';
+    singularName: 't-optiongroup';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    code: Schema.Attribute.String;
+    config: Schema.Attribute.RichText;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::t-optiongroup.t-optiongroup'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    t_options: Schema.Attribute.Relation<'oneToMany', 'api::t-option.t-option'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiUserCompetencyUserCompetency
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'user_competencies';
+  info: {
+    displayName: 'userCompetency';
+    pluralName: 'user-competencies';
+    singularName: 'user-competency';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    code: Schema.Attribute.String;
+    competencyid: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::competency.competency'
+    >;
+    competencyleveloptid: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::t-option.t-option'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-competency.user-competency'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    userid: Schema.Attribute.Relation<
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
   };
@@ -971,7 +1679,18 @@ export interface PluginUsersPermissionsUser
     draftAndPublish: false;
   };
   attributes: {
+    attempts: Schema.Attribute.Relation<'oneToMany', 'api::attempt.attempt'>;
+    attendances: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::attendance.attendance'
+    >;
+    birthday: Schema.Attribute.Date;
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    certificates: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::certificate.certificate'
+    >;
+    code: Schema.Attribute.String;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     createdAt: Schema.Attribute.DateTime;
@@ -982,12 +1701,18 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    enrollments: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::enrollment.enrollment'
+    >;
+    gender: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
+    name: Schema.Attribute.String;
     orgunit: Schema.Attribute.Relation<'manyToOne', 'api::orgunit.orgunit'>;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
@@ -1001,9 +1726,17 @@ export interface PluginUsersPermissionsUser
       'manyToOne',
       'plugin::users-permissions.role'
     >;
+    submissions: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::submission.submission'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user_competencies: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-competency.user-competency'
+    >;
     username: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique &
@@ -1024,8 +1757,26 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::assignment.assignment': ApiAssignmentAssignment;
+      'api::attempt.attempt': ApiAttemptAttempt;
+      'api::attendance.attendance': ApiAttendanceAttendance;
       'api::cache-rule.cache-rule': ApiCacheRuleCacheRule;
+      'api::certificate.certificate': ApiCertificateCertificate;
+      'api::clazz-detail.clazz-detail': ApiClazzDetailClazzDetail;
+      'api::clazz.clazz': ApiClazzClazz;
+      'api::competency.competency': ApiCompetencyCompetency;
+      'api::course-competency.course-competency': ApiCourseCompetencyCourseCompetency;
+      'api::course-detail.course-detail': ApiCourseDetailCourseDetail;
+      'api::course.course': ApiCourseCourse;
+      'api::enrollment.enrollment': ApiEnrollmentEnrollment;
+      'api::expriment.expriment': ApiExprimentExpriment;
       'api::orgunit.orgunit': ApiOrgunitOrgunit;
+      'api::question.question': ApiQuestionQuestion;
+      'api::quiz.quiz': ApiQuizQuiz;
+      'api::submission.submission': ApiSubmissionSubmission;
+      'api::t-option.t-option': ApiTOptionTOption;
+      'api::t-optiongroup.t-optiongroup': ApiTOptiongroupTOptiongroup;
+      'api::user-competency.user-competency': ApiUserCompetencyUserCompetency;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

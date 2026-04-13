@@ -1,0 +1,60 @@
+{
+  "kind": "collectionType",
+  "collectionName": "t_options",
+  "info": {
+    "singularName": "t-option",
+    "pluralName": "t-options",
+    "displayName": "t option"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "config": {
+      "type": "richtext"
+    },
+    "optiongroupid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::t-optiongroup.t-optiongroup",
+      "inversedBy": "t_options"
+    },
+    "competencies": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::competency.competency",
+      "mappedBy": "competencyleveloptid"
+    },
+    "course_competencies": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::course-competency.course-competency",
+      "mappedBy": "competencyleveloptid"
+    },
+    "questions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::question.question",
+      "mappedBy": "questiontypeoptid"
+    },
+    "certificates": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::certificate.certificate",
+      "mappedBy": "certtypeoptid"
+    },
+    "user_competencies": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-competency.user-competency",
+      "mappedBy": "competencyleveloptid"
+    }
+  }
+}

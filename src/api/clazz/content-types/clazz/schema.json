@@ -1,0 +1,57 @@
+{
+  "kind": "collectionType",
+  "collectionName": "clazzes",
+  "info": {
+    "singularName": "clazz",
+    "pluralName": "clazzes",
+    "displayName": "clazz"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "strartdate": {
+      "type": "date"
+    },
+    "enddate": {
+      "type": "date"
+    },
+    "description": {
+      "type": "richtext"
+    },
+    "isprivate": {
+      "type": "boolean"
+    },
+    "isfinished": {
+      "type": "boolean"
+    },
+    "courseid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::course.course",
+      "inversedBy": "clazzes"
+    },
+    "isclosed": {
+      "type": "boolean"
+    },
+    "clazz_details": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::clazz-detail.clazz-detail",
+      "mappedBy": "clazzid"
+    },
+    "enrollments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::enrollment.enrollment",
+      "mappedBy": "clazzid"
+    }
+  }
+}

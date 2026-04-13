@@ -1,0 +1,42 @@
+{
+  "kind": "collectionType",
+  "collectionName": "enrollments",
+  "info": {
+    "singularName": "enrollment",
+    "pluralName": "enrollments",
+    "displayName": "enrollment"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "clazzid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::clazz.clazz",
+      "inversedBy": "enrollments"
+    },
+    "userid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "enrollments"
+    },
+    "score": {
+      "type": "decimal"
+    },
+    "enrolltime": {
+      "type": "datetime"
+    },
+    "ispassed": {
+      "type": "boolean"
+    }
+  }
+}

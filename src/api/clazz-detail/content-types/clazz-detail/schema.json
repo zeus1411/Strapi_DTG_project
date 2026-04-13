@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "clazz_details",
+  "info": {
+    "singularName": "clazz-detail",
+    "pluralName": "clazz-details",
+    "displayName": "clazzDetail"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "clazzid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::clazz.clazz",
+      "inversedBy": "clazz_details"
+    },
+    "orderno": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "isfinished": {
+      "type": "boolean"
+    },
+    "assignments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::assignment.assignment",
+      "mappedBy": "clazzdetailid"
+    },
+    "quizzes": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::quiz.quiz",
+      "mappedBy": "clazzdetailid"
+    },
+    "attendances": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::attendance.attendance",
+      "mappedBy": "clazzdetailid"
+    }
+  }
+}

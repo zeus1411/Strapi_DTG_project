@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "quizzes",
+  "info": {
+    "singularName": "quiz",
+    "pluralName": "quizzes",
+    "displayName": "quiz"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "coursedetailid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::course-detail.course-detail",
+      "inversedBy": "quizzes"
+    },
+    "clazzdetailid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::clazz-detail.clazz-detail",
+      "inversedBy": "quizzes"
+    },
+    "description": {
+      "type": "richtext"
+    },
+    "totalscore": {
+      "type": "decimal"
+    },
+    "attemptno": {
+      "type": "integer"
+    },
+    "questions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::question.question",
+      "mappedBy": "quizid"
+    },
+    "attempts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::attempt.attempt",
+      "mappedBy": "quizid"
+    }
+  }
+}

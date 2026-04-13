@@ -131,3 +131,5 @@ build
 .strapi-updater.json
 .strapi-cloud.json
 scripts/setup-public-private-buckets.ps1
+QUICK_START.md
+WORKFLOW_EXPLAINED.md

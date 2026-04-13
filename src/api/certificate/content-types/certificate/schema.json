@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "certificates",
+  "info": {
+    "singularName": "certificate",
+    "pluralName": "certificates",
+    "displayName": "certificate"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "certtypeoptid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::t-option.t-option",
+      "inversedBy": "certificates"
+    },
+    "userid": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "certificates"
+    },
+    "issueddate": {
+      "type": "date"
+    },
+    "expireddate": {
+      "type": "date"
+    }
+  }
+}
