@@ -9,6 +9,7 @@ export default [
   'strapi::session',
   'strapi::favicon',
   'strapi::public',
+  'global::populate-comma', // Allow populate=rel1,rel2 for Swagger/testing convenience
   'global::bucket-selector', // Dynamic bucket selection for uploads
   'global::cache', // Redis cache middleware - reads rules from DB
 ];
